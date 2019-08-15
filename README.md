@@ -25,24 +25,27 @@ for file in *.sorted.bam; do samtools idxstats "${file%%.*}".sorted.bam | cut -f
 
 
 ## Counting the Number of Reads around TSS 
-```bash
+```R
+require(TxDb.Hsapiens.UCSC.hg19.knownGene)
+# To avoid have to type the whole package name every time, we use the variable name txdb
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 
+
+pms <- promoters(genes(txdb), upstream = 5000, downstream = 5000)
+
+
+gr<- unlist(tile(pms, width=100))
+
+
+df <- data.frame(seqnames=seqnames(gr),
+                 starts=start(gr),
+                 ends=end(gr),
+                 names=c(rep(".", length(gr))),
+                 scores=c(rep(".", length(gr))),
+                 strands=strand(gr))
+
+write.table(df, file="foo.bed", quote=F, sep="\t", row.names=F, col.names=F)
 ```
-
-for file in *.tagAlign; do   bedtools bedtobam -i "${file%%.*}".tagAlign -g hg19.txt > "${file%%.*}".bam; done
-for file in *.bam; do samtools idxstats "${file%%.*}".bam | cut -f3 | awk 'BEGIN {total=0} {total += $1} END {print total}'; done 
-
-
-bedtools bedtobam -i "${file%%.*}".tagAlign -g hg19chrom.sizes > "${file%%.*}"
-
-zless $tg | shuf -n 15000000 | bedtobam -i - -g hg19.txt
-
-E075-H3K27me3.sorted.bam
-E075-H3K4me1.sorted.bam	
-E075-H3K4me3.sorted.bam
-E075-H3K9me3.sorted.bam
-E087-H3K27me3.sorted.bam
-E087-H3K4me1.sorted.bam
 
 
 
