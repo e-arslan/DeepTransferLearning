@@ -29,7 +29,20 @@ for file in *.sorted.bam; do samtools idxstats "${file%%.*}".sorted.bam | cut -f
 
 ```
 
+for file in *.tagAlign; do   bedtools bedtobam -i "${file%%.*}".tagAlign -g hg19.txt > "${file%%.*}".bam; done
+for file in *.bam; do samtools idxstats "${file%%.*}".bam | cut -f3 | awk 'BEGIN {total=0} {total += $1} END {print total}'; done 
 
+
+bedtools bedtobam -i "${file%%.*}".tagAlign -g hg19chrom.sizes > "${file%%.*}"
+
+zless $tg | shuf -n 15000000 | bedtobam -i - -g hg19.txt
+
+E075-H3K27me3.sorted.bam
+E075-H3K4me1.sorted.bam	
+E075-H3K4me3.sorted.bam
+E075-H3K9me3.sorted.bam
+E087-H3K27me3.sorted.bam
+E087-H3K4me1.sorted.bam
 
 
 
